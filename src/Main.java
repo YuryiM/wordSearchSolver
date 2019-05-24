@@ -26,7 +26,7 @@ public class Main {
                             {'a','l','r','k','r','r','i','r','e','r'},
                             {'k','o','d','i','d','e','d','r','c','d'},
                             {'h','e','l','w','s','l','e','u','t','h'}};
-        String[] words = {"wikipedia", "find", "random", "sleuth", "backward", "vertical", "diagonal", "wikipedia", "horizontal", "word search"};//keyboard.next().split(",");
+        String[] words = {"wikipedia"};//, "find", "random", "sleuth", "backward", "vertical", "diagonal", "wikipedia", "horizontal", "word search"};//keyboard.next().split(",");
         Board testBoard1 = new Board(words, board1);
 
     }

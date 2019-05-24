@@ -1,20 +1,23 @@
+import java.util.Arrays;
+
 public class Board {
     char[][] board;
     char[][] solved;
     String[] words;
-    int[][] foundsCord;
+    int[][] foundCords;
+    int[][] tempCords;
 
     public Board(String[] wordList, char[][] gameBoard){
         this.words = wordList;
         this.board = gameBoard;
         int charCount = 0;
         for(String word : wordList){ charCount+= word.length(); }
-        foundsCord = new int[charCount][2];
+        foundCords = new int[charCount][2];
         solve();
     }
 
     private void solve(){
-        //Cycles through word array
+        //Cycles through word array, gets coordinates to highlight
         for(String word : words){
             //Goes through every row
             for(int r = 0; r < board.length; r++){
@@ -32,12 +35,7 @@ public class Board {
                                 if (word.charAt(1) == board[((r - 1) + (i / 3))][((c - 1) + (i % 3))]) {
                                     int r2 = ((r - 1) + (i / 3));
                                     int c2 = ((c - 1) + (i % 3));
-                                    System.out.println(determineDirection(r, c, ((r - 1) + (i / 3)), ((c - 1) + (i % 3))));
-                                    System.out.println(r + " " + c + " " + board[r][c]);
-                                    System.out.println(r2 + " " + c2 + " " + board[r2][c2]);
-
-                                    checkDirection(word, r2, c2, 2, determineDirection(r, c, r2, c2));
-
+                                    checkDirection(word, r, c, r2, c2, 2, determineDirection(r, c, r2, c2));
                                 }
                             } catch (ArrayIndexOutOfBoundsException ex) { }
                         }
@@ -45,62 +43,101 @@ public class Board {
                 }
             }
         }
+
+        solved = board;
+        for(int i = 0 ; i < foundCords.length; i++){
+            solved[foundCords[i][0]][foundCords[i][1]] = Character.toUpperCase(solved[i][0]);
+        }
+        //printBoard(foundCords);
     }
-    private void checkDirection(String word, int x, int y, int index, String direction){
+    private boolean checkDirection(String word, int orX, int orY,int x, int y, int index, String direction){
+        //DOESNT WORK BC RESETS WITH EVERY RESCURIVE THING
+        tempCords = new int[word.length()][2];
+        tempCords[0][0] = orX;
+        tempCords[0][1] = orY;
+        tempCords[1][0] = orX;
+        tempCords[1][1] = orY;
+        System.out.println("T1: "+ tempCords[0][0] + " " + tempCords[0][1]);
+        int i = 2;
         if(word.length() != index) {
             try {
                 switch (direction) {
                     case "up":
                         if((word.charAt(index) == board[x-1][y])){
-                            System.out.println(x-1 +" " + y + " " + board[x-1][y]);
-                            checkDirection(word, x - 1, y, index + 1, direction);
+                            tempCords[2][0] = x-1;
+                            tempCords[2][1] = y;
+                            //System.out.println(tempCords[i][0] + " " + tempCords[i][1]);
+                            checkDirection(word, orX, orY, x - 1, y, index + 1, direction);
+                            i++;
                         }
                         break;
                     case "down":
                         if((word.charAt(index) == board[x+1][y])){
-                            System.out.println(x+1 +" " + y + " " + board[x+1][y]);
-                            checkDirection(word, x + 1, y, index + 1, direction);
+                            tempCords[i][0] = x+1;
+                            tempCords[i][1] = y;
+                            checkDirection(word, orX, orY, x + 1, y, index + 1, direction);
                         }
                         break;
                     case "left":
                         if((word.charAt(index) == board[x][y - 1])){
-                            System.out.println(x +" " + (y-1));
-                            checkDirection(word, x, y - 1, index + 1, direction);
+                            tempCords[i][0] = x;
+                            tempCords[i][1] = y-1;
+                            checkDirection(word, orX, orY, x, y - 1, index + 1, direction);
                         }
                         break;
                     case "right":
                         if((word.charAt(index) == board[x][y + 1])){
-                            System.out.println(x +" " + (y+1 )+ " " + board[x][y+1]);
-                            checkDirection(word, x, y+1, index + 1, direction);
+                            tempCords[i][0] = x;
+                            tempCords[i][1] = y+1;
+                            checkDirection(word, orX, orY, x, y+1, index + 1, direction);
                         }
                         break;
                     case "udleft":
                         if((word.charAt(index) == board[x-1][y-1])){
-                            System.out.println(x-1 +" " + (y-1));
-                            checkDirection(word, x - 1, y-1, index + 1, direction);
+                            tempCords[i][0] = x-1;
+                            tempCords[i][1] = y-1;
+                            checkDirection(word, orX, orY, x - 1, y-1, index + 1, direction);
                         }
                         break;
                     case "udright":
                         if((word.charAt(index) == board[x-1][y + 1])){
-                            System.out.println(x-1 +" " + (y+1));
-                            checkDirection(word, x - 1, y+1, index + 1, direction);
+                            tempCords[i][0] = x-1;
+                            tempCords[i][1] = y+1;
+                            checkDirection(word, orX, orY, x - 1, y+1, index + 1, direction);
                         }
                         break;
                     case "ddleft":
                         if((word.charAt(index) == board[x+1][y-1])){
-                            System.out.println(x+1 +" " + (y-1));
-                            checkDirection(word, x +1, y-1, index + 1, direction);
+                            tempCords[i][0] = x+1;
+                            tempCords[i][1] = y-1;
+                            checkDirection(word, orX, orY, x +1, y-1, index + 1, direction);
                         }
                         break;
                     case "ddright":
                         if((word.charAt(index) == board[x+1][y+1])){
-                            System.out.println(x+1 +" " + (y+1) + " " + board[x+1][y+1]);
-                            checkDirection(word, x + 1, y+1, index + 1, direction);
+                            tempCords[i][0] = x+1;
+                            tempCords[i][1] = y+1;
+                            checkDirection(word, orX, orY, x + 1, y+1, index + 1, direction);
                         }
                 }
             } catch (ArrayIndexOutOfBoundsException ex) { }
         }
+        else if(word.length() == index){
+            //System.out.println(tempCords[0][0] + " " + tempCords[i][1]);
+            printBoard(tempCords);
+            foundCords = append(foundCords, tempCords);
+            return true;
+        }
+        return false;
     }
+
+    public static int[][] append(int[][] a, int[][] b) {
+        int[][] result = new int[a.length + b.length][];
+        System.arraycopy(a, 0, result, 0, a.length);
+        System.arraycopy(b, 0, result, a.length, b.length);
+        return result;
+    }
+
 
     /*
     @parameter x1 :: beginning x-coordinate of word
@@ -118,6 +155,15 @@ public class Board {
         else if(x1 - x2 == 1 && y1 - y2 == -1){ return "udright"; }
         else if(x1 - x2 == -1 && y1 - y2 == 1){ return "ddleft"; }
         else if(x1 - x2 == -1 && y1 - y2 == -1){ return "ddright"; }
-        return "Not a valid test!";
+        return "";
+    }
+
+    private void printBoard(int[][] board){
+        for(int r = 0; r < board.length; r++){
+            for(int c = 0; c < board[r].length; c++){
+                System.out.print(board[r][c] + " ");
+            }
+            System.out.println();
+        }
     }
 }
