@@ -6,14 +6,14 @@ public class Board {
     String[] words;
     int[][] foundCords;
     int[][] tempCords;
+    int tempIndex;
 
     public Board(String[] wordList, char[][] gameBoard){
         this.words = wordList;
         this.board = gameBoard;
-        int charCount = 0;
-        for(String word : wordList){ charCount+= word.length(); }
-        foundCords = new int[charCount][2];
+        foundCords = new int[0][2];
         solve();
+        printBoard(solved);
     }
 
     private void solve(){
@@ -23,18 +23,21 @@ public class Board {
             for(int r = 0; r < board.length; r++){
                 //Goes through every column in a row
                 for(int c = 0; c < board[r].length; c++){
-
-                    int index = 0;
                     //if first letter of word matches character at coordinates
                     if(word.charAt(0) == board[r][c]) {
-                        //finds direction which word goes in
+                        //finds direction which word goes in, identifies location of second character
                         for (int i = 0; i < 9; i++) {
                             try {
-                                //determineDirection();
-                                //System.out.println(((r-1) + (i/3))+ ", " + ((c-1) + (i%3)) + "  " + board[((r-1) + (i/3))][((c-1) + (i%3))] + "  " + word.charAt(1));
                                 if (word.charAt(1) == board[((r - 1) + (i / 3))][((c - 1) + (i % 3))]) {
                                     int r2 = ((r - 1) + (i / 3));
                                     int c2 = ((c - 1) + (i % 3));
+                                    tempIndex = 2;
+                                    tempCords = new int[word.length()][2];
+                                    tempCords[0][0] = r;
+                                    tempCords[0][1] = c;
+                                    tempCords[1][0] = r2;
+                                    tempCords[1][1] = c2;
+
                                     checkDirection(word, r, c, r2, c2, 2, determineDirection(r, c, r2, c2));
                                 }
                             } catch (ArrayIndexOutOfBoundsException ex) { }
@@ -43,88 +46,85 @@ public class Board {
                 }
             }
         }
-
         solved = board;
-        for(int i = 0 ; i < foundCords.length; i++){
-            solved[foundCords[i][0]][foundCords[i][1]] = Character.toUpperCase(solved[i][0]);
+        for(int i = 0; i < foundCords.length; i++){
+            solved[foundCords[i][0]][foundCords[i][1]] = Character.toUpperCase(solved[foundCords[i][0]][foundCords[i][1]]);
         }
+
+
         //printBoard(foundCords);
     }
     private boolean checkDirection(String word, int orX, int orY,int x, int y, int index, String direction){
-        //DOESNT WORK BC RESETS WITH EVERY RESCURIVE THING
-        tempCords = new int[word.length()][2];
-        tempCords[0][0] = orX;
-        tempCords[0][1] = orY;
-        tempCords[1][0] = orX;
-        tempCords[1][1] = orY;
-        System.out.println("T1: "+ tempCords[0][0] + " " + tempCords[0][1]);
-        int i = 2;
         if(word.length() != index) {
             try {
                 switch (direction) {
                     case "up":
                         if((word.charAt(index) == board[x-1][y])){
-                            tempCords[2][0] = x-1;
-                            tempCords[2][1] = y;
-                            //System.out.println(tempCords[i][0] + " " + tempCords[i][1]);
+                            tempCords[tempIndex][0] = x-1;
+                            tempCords[tempIndex][1] = y;
+                            this.tempIndex += 1;
                             checkDirection(word, orX, orY, x - 1, y, index + 1, direction);
-                            i++;
                         }
                         break;
                     case "down":
                         if((word.charAt(index) == board[x+1][y])){
-                            tempCords[i][0] = x+1;
-                            tempCords[i][1] = y;
+                            tempCords[tempIndex][0] = x+1;
+                            tempCords[tempIndex][1] = y;
+                            this.tempIndex += 1;
                             checkDirection(word, orX, orY, x + 1, y, index + 1, direction);
                         }
                         break;
                     case "left":
                         if((word.charAt(index) == board[x][y - 1])){
-                            tempCords[i][0] = x;
-                            tempCords[i][1] = y-1;
+                            tempCords[tempIndex][0] = x;
+                            tempCords[tempIndex][1] = y-1;
+                            this.tempIndex += 1;
                             checkDirection(word, orX, orY, x, y - 1, index + 1, direction);
                         }
                         break;
                     case "right":
                         if((word.charAt(index) == board[x][y + 1])){
-                            tempCords[i][0] = x;
-                            tempCords[i][1] = y+1;
+                            tempCords[tempIndex][0] = x;
+                            tempCords[tempIndex][1] = y+1;
+                            this.tempIndex += 1;
                             checkDirection(word, orX, orY, x, y+1, index + 1, direction);
                         }
                         break;
                     case "udleft":
                         if((word.charAt(index) == board[x-1][y-1])){
-                            tempCords[i][0] = x-1;
-                            tempCords[i][1] = y-1;
+                            tempCords[tempIndex][0] = x-1;
+                            tempCords[tempIndex][1] = y-1;
+                            this.tempIndex += 1;
                             checkDirection(word, orX, orY, x - 1, y-1, index + 1, direction);
                         }
                         break;
                     case "udright":
                         if((word.charAt(index) == board[x-1][y + 1])){
-                            tempCords[i][0] = x-1;
-                            tempCords[i][1] = y+1;
+                            tempCords[tempIndex][0] = x-1;
+                            tempCords[tempIndex][1] = y+1;
+                            this.tempIndex += 1;
                             checkDirection(word, orX, orY, x - 1, y+1, index + 1, direction);
                         }
                         break;
                     case "ddleft":
                         if((word.charAt(index) == board[x+1][y-1])){
-                            tempCords[i][0] = x+1;
-                            tempCords[i][1] = y-1;
+                            tempCords[tempIndex][0] = x+1;
+                            tempCords[tempIndex][1] = y-1;
+                            this.tempIndex += 1;
                             checkDirection(word, orX, orY, x +1, y-1, index + 1, direction);
                         }
                         break;
                     case "ddright":
                         if((word.charAt(index) == board[x+1][y+1])){
-                            tempCords[i][0] = x+1;
-                            tempCords[i][1] = y+1;
+                            tempCords[tempIndex][0] = x+1;
+                            tempCords[tempIndex][1] = y+1;
+                            this.tempIndex += 1;
                             checkDirection(word, orX, orY, x + 1, y+1, index + 1, direction);
                         }
                 }
             } catch (ArrayIndexOutOfBoundsException ex) { }
         }
         else if(word.length() == index){
-            //System.out.println(tempCords[0][0] + " " + tempCords[i][1]);
-            printBoard(tempCords);
             foundCords = append(foundCords, tempCords);
             return true;
         }
@@ -158,7 +158,7 @@ public class Board {
         return "";
     }
 
-    private void printBoard(int[][] board){
+    private void printBoard(char[][] board){
         for(int r = 0; r < board.length; r++){
             for(int c = 0; c < board[r].length; c++){
                 System.out.print(board[r][c] + " ");
